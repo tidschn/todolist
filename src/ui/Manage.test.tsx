@@ -45,6 +45,26 @@ describe('Habits & Tasks screen', () => {
     expect(storage.current().habits[0].title).toBe('Read 20 pages');
   });
 
+  it('tapping a title does not open the editor (rows are not one big label)', async () => {
+    const { user } = await openManage();
+    await user.click(screen.getByText('Read'));
+    await user.click(screen.getByText('Email landlord'));
+    expect(screen.queryByRole('button', { name: /^save$/i })).not.toBeInTheDocument();
+  });
+
+  it('can edit a completed task', async () => {
+    const { user, storage } = await openManage();
+    await user.click(screen.getByRole('button', { name: /edit file taxes/i }));
+    const title = screen.getByLabelText(/title/i);
+    expect(title).toHaveValue('File taxes');
+    await user.clear(title);
+    await user.type(title, 'File taxes 2026');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(screen.getByText('File taxes 2026')).toBeInTheDocument();
+    expect(storage.current().tasks.find((t) => t.id === 't2')!.title).toBe('File taxes 2026');
+    expect(storage.current().completions).toHaveLength(1);
+  });
+
   it('deletes a task after confirmation but keeps its earned points', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     const { user, storage } = await openManage();

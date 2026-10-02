@@ -19,6 +19,8 @@ export interface StateStorage {
   load(): LoadResult;
   /** Returns false when the write failed (storage full or blocked). */
   save(state: AppState): boolean;
+  /** Calls back when another tab saved a new valid state. Returns an unsubscribe function. */
+  subscribe?(onExternalChange: (state: AppState) => void): () => void;
 }
 
 function unavailableStore(): KeyValueStore {
@@ -62,6 +64,15 @@ export function createLocalStorage(kv: KeyValueStore = defaultStore()): StateSto
         /* nothing more we can do */
       }
       return { state: emptyState(), notice: 'recovered' };
+    },
+    subscribe(onExternalChange) {
+      const handler = (e: StorageEvent) => {
+        if (e.key !== STORAGE_KEY || e.newValue === null) return;
+        const state = tryParse(e.newValue);
+        if (state) onExternalChange(state); // unreadable or newer data from elsewhere never replaces ours
+      };
+      window.addEventListener('storage', handler);
+      return () => window.removeEventListener('storage', handler);
     },
     save(state) {
       try {

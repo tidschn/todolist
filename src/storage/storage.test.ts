@@ -5,6 +5,39 @@ import { full } from './fixtures';
 
 beforeEach(() => localStorage.clear());
 
+function otherTabWrote(key: string, newValue: string | null) {
+  window.dispatchEvent(new StorageEvent('storage', { key, newValue }));
+}
+
+describe('subscribe (changes made in another tab)', () => {
+  it('delivers a valid state written by another tab', () => {
+    const seen: unknown[] = [];
+    const off = createLocalStorage(localStorage).subscribe!((s) => seen.push(s));
+    otherTabWrote(STORAGE_KEY, JSON.stringify(full));
+    expect(seen).toEqual([full]);
+    off();
+  });
+
+  it('ignores other keys, deletions and unreadable values so local data is never clobbered', () => {
+    const seen: unknown[] = [];
+    const off = createLocalStorage(localStorage).subscribe!((s) => seen.push(s));
+    otherTabWrote('something-else', JSON.stringify(full));
+    otherTabWrote(STORAGE_KEY, null);
+    otherTabWrote(STORAGE_KEY, '{oops');
+    otherTabWrote(STORAGE_KEY, JSON.stringify({ ...full, version: 2 }));
+    expect(seen).toEqual([]);
+    off();
+  });
+
+  it('stops delivering after unsubscribe', () => {
+    const seen: unknown[] = [];
+    const off = createLocalStorage(localStorage).subscribe!((s) => seen.push(s));
+    off();
+    otherTabWrote(STORAGE_KEY, JSON.stringify(full));
+    expect(seen).toEqual([]);
+  });
+});
+
 describe('createLocalStorage', () => {
   it('returns an empty state with no notice when nothing is saved', () => {
     expect(createLocalStorage(localStorage).load()).toEqual({ state: emptyState() });

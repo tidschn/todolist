@@ -53,4 +53,10 @@ describe('isDateKey', () => {
     expect(isDateKey(20261002)).toBe(false);
     expect(isDateKey(undefined)).toBe(false);
   });
+  it('accepts every 4-digit year the date input can produce, and rejects 5-digit years', () => {
+    expect(isDateKey('0202-10-02')).toBe(true);
+    expect(isDateKey('0999-12-31')).toBe(true);
+    expect(isDateKey('20266-10-02')).toBe(false);
+    expect(addDays('0999-12-31', 1)).toBe('1000-01-01');
+  });
 });

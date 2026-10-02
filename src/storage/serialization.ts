@@ -38,10 +38,9 @@ function parseSchedule(v: unknown): Schedule | null {
 
 function parseTask(v: unknown): Task | null {
   if (!isObj(v) || !isId(v.id) || typeof v.title !== 'string' || !isDifficulty(v.difficulty)) return null;
-  const due = v.dueDate;
-  if (due !== undefined && !isDateKey(due)) return null;
+  const due = v.dueDate; // optional: an unusable value is dropped rather than rejecting the whole document
   const task: Task = { id: v.id, title: v.title, difficulty: v.difficulty };
-  if (typeof due === 'string') task.dueDate = due;
+  if (isDateKey(due)) task.dueDate = due;
   return task;
 }
 

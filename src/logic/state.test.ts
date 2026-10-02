@@ -57,6 +57,14 @@ describe('completing tasks', () => {
     expect(s.tasks[0]).toMatchObject({ title: 'Renamed', difficulty: 'hard' });
     expect(lifetimePoints(s)).toBe(5);
   });
+  it('drops a due date that is not a real calendar date instead of storing it', () => {
+    for (const bad of ['20266-10-02', '2026-02-30', 'abc', '0050-10-02']) {
+      const s = run({ type: 'addTask', id: 't', title: 'T', difficulty: 'easy', dueDate: bad });
+      expect(s.tasks[0].dueDate).toBeUndefined();
+    }
+    const edited = reducer(run(addTask('t1')), { type: 'updateTask', id: 't1', title: 'T', difficulty: 'easy', dueDate: '2026-13-01' });
+    expect(edited.tasks[0].dueDate).toBeUndefined();
+  });
   it('updateTask can set and clear the due date', () => {
     let s = run(addTask('t1'));
     s = reducer(s, { type: 'updateTask', id: 't1', title: 'T', difficulty: 'easy', dueDate: '2026-10-09' });

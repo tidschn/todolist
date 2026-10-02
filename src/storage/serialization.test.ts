@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ImportError, exportState, importState, migrate, parseState } from './serialization';
-import { emptyState } from '../logic/state';
+import { emptyState, reducer } from '../logic/state';
 import { full } from './fixtures';
 
 describe('parseState', () => {
@@ -24,6 +24,24 @@ describe('parseState', () => {
     ['a missing version', { ...full, version: undefined }],
   ])('rejects %s', (_label, raw) => {
     expect(parseState(raw)).toBeNull();
+  });
+});
+
+describe('parseState leniency for optional fields', () => {
+  it('keeps the whole document when only a task due date is unusable', () => {
+    const raw = { ...full, tasks: [{ id: 't9', title: 'Typo year', difficulty: 'easy', dueDate: '20266-10-02' }] };
+    const parsed = parseState(raw);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.tasks).toEqual([{ id: 't9', title: 'Typo year', difficulty: 'easy' }]);
+    expect(parsed!.completions).toEqual(full.completions);
+  });
+  it('every state the reducer can produce survives a save/load round trip', () => {
+    let s = emptyState();
+    for (const dueDate of ['0202-10-02', '20266-10-02', 'garbage', '2026-10-05', undefined]) {
+      s = reducer(s, { type: 'addTask', id: `t-${String(dueDate)}`, title: 'T', difficulty: 'easy', dueDate });
+    }
+    s = reducer(s, { type: 'toggleTask', id: 't-2026-10-05', today: '2026-10-02' });
+    expect(parseState(JSON.parse(JSON.stringify(s)))).toEqual(s);
   });
 });
 

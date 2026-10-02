@@ -39,6 +39,15 @@ describe('Rewards screen', () => {
     expect(screen.getByRole('button', { name: /redeem gaming hour/i })).toBeDisabled();
   });
 
+  it('tapping a reward name or cost does not redeem it', async () => {
+    const { user } = await openRewards(30);
+    await addReward(user, 'Coffee', '15');
+    await user.click(screen.getByText('Coffee'));
+    await user.click(screen.getByText('15 pts'));
+    expect(screen.getByTestId('balance')).toHaveTextContent('30');
+    expect(screen.queryByRole('heading', { name: /history/i })).not.toBeInTheDocument();
+  });
+
   it('redeeming spends the balance, logs history, and keeps the level', async () => {
     const { user } = await openRewards(30);
     await addReward(user, 'Coffee', '15');

@@ -7,15 +7,30 @@ import type { StateStorage } from './storage/storage';
 
 export const NOW = () => new Date(2026, 9, 2, 12, 0, 0); // Friday 2026-10-02
 
-export function memoryStorage(initial: AppState = emptyState()): StateStorage & { current(): AppState } {
+export type MemoryStorage = StateStorage & {
+  current(): AppState;
+  /** Simulates another browser tab saving a new state. */
+  otherTabSaves(state: AppState): void;
+};
+
+export function memoryStorage(initial: AppState = emptyState()): MemoryStorage {
   let current = initial;
+  const listeners = new Set<(s: AppState) => void>();
   return {
     load: () => ({ state: current }),
     save: (s) => {
       current = s;
       return true;
     },
+    subscribe: (cb) => {
+      listeners.add(cb);
+      return () => listeners.delete(cb);
+    },
     current: () => current,
+    otherTabSaves: (s) => {
+      current = s;
+      listeners.forEach((cb) => cb(s));
+    },
   };
 }
 

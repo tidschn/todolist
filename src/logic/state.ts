@@ -1,4 +1,4 @@
-import type { DateKey } from './dates';
+import { isDateKey, type DateKey } from './dates';
 import { newlyEarnedBadges } from './badges';
 import { isHabitDue } from './habits';
 import { POINTS } from './points';
@@ -34,7 +34,7 @@ function normalizeSchedule(s: Schedule): Schedule | null {
 
 function buildTask(id: string, title: string, difficulty: Difficulty, dueDate?: DateKey): Task {
   const task: Task = { id, title, difficulty };
-  if (dueDate) task.dueDate = dueDate;
+  if (dueDate && isDateKey(dueDate)) task.dueDate = dueDate; // anything else would make the saved file unreadable
   return task;
 }
 

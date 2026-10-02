@@ -2,9 +2,10 @@ export type DateKey = string; // 'YYYY-MM-DD' in the user's local time
 
 const DAY_MS = 86_400_000;
 const pad = (n: number) => String(n).padStart(2, '0');
+const padYear = (n: number) => String(n).padStart(4, '0');
 
 export function toDateKey(d: Date): DateKey {
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${padYear(d.getFullYear())}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 // All arithmetic goes through UTC midnight so DST shifts never add or drop a day.
@@ -15,7 +16,7 @@ function toUtcMs(key: DateKey): number {
 
 function fromUtcMs(ms: number): DateKey {
   const d = new Date(ms);
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  return `${padYear(d.getUTCFullYear())}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
 export function addDays(key: DateKey, n: number): DateKey {

@@ -62,14 +62,14 @@ export function Manage() {
             </li>
           ) : (
             <li key={h.id} className="row">
-              <label>
+              <div className="row-body">
                 <span className="title">{h.title}</span>
                 <span className={`tag ${h.difficulty}`}>
                   {DIFFICULTY_LABEL[h.difficulty]} · {POINTS[h.difficulty]} pts
                 </span>
                 <span className="meta">{describeSchedule(h.schedule)}</span>
                 {actions('habit', h.id, h.title)}
-              </label>
+              </div>
             </li>
           ),
         )}
@@ -91,14 +91,14 @@ export function Manage() {
             </li>
           ) : (
             <li key={t.id} className="row">
-              <label>
+              <div className="row-body">
                 <span className="title">{t.title}</span>
                 <span className={`tag ${t.difficulty}`}>
                   {DIFFICULTY_LABEL[t.difficulty]} · {POINTS[t.difficulty]} pts
                 </span>
                 {t.dueDate && <span className="meta">Due {t.dueDate}</span>}
                 {actions('task', t.id, t.title)}
-              </label>
+              </div>
             </li>
           ),
         )}
@@ -108,15 +108,27 @@ export function Manage() {
         <>
           <h3>Completed tasks</h3>
           <ul className="list">
-            {doneTasks.map((t) => (
-              <li key={t.id} className="row done">
-                <label>
-                  <span className="title">{t.title}</span>
-                  <span className="meta">Done {doneDate.get(t.id)}</span>
-                  {actions('task', t.id, t.title)}
-                </label>
-              </li>
-            ))}
+            {doneTasks.map((t) =>
+              editing?.kind === 'task' && editing.id === t.id ? (
+                <li key={t.id}>
+                  <ItemForm
+                    lockKind
+                    submitLabel="Save"
+                    initial={{ kind: 'task', title: t.title, difficulty: t.difficulty, dueDate: t.dueDate, schedule: { kind: 'daily' } }}
+                    onSubmit={save}
+                    onCancel={() => setEditing(null)}
+                  />
+                </li>
+              ) : (
+                <li key={t.id} className="row done">
+                  <div className="row-body">
+                    <span className="title">{t.title}</span>
+                    <span className="meta">Done {doneDate.get(t.id)}</span>
+                    {actions('task', t.id, t.title)}
+                  </div>
+                </li>
+              ),
+            )}
           </ul>
         </>
       )}

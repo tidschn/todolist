@@ -45,7 +45,7 @@ export function Rewards() {
         <ul className="list">
           {state.rewards.map((r) => (
             <li key={r.id} className="row">
-              <label>
+              <div className="row-body">
                 <span className="title">{r.name}</span>
                 <span className="tag">{r.cost} pts</span>
                 <span className="row-actions">
@@ -60,7 +60,7 @@ export function Rewards() {
                     Delete
                   </button>
                 </span>
-              </label>
+              </div>
             </li>
           ))}
         </ul>

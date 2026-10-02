@@ -74,7 +74,7 @@ export function ItemForm({ initial, lockKind, submitLabel, onSubmit, onCancel }:
       {kind === 'task' ? (
         <label>
           Due date (optional)
-          <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          <input type="date" min="2000-01-01" max="2099-12-31" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
         </label>
       ) : (
         <fieldset>

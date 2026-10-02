@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
-import type { DateKey } from '../logic/dates';
+import { toDateKey, type DateKey } from '../logic/dates';
 import { progressStats, type ProgressStats } from '../logic/selectors';
 import { reducer, type Action } from '../logic/state';
 import type { AppState } from '../logic/types';
@@ -41,6 +41,12 @@ export function AppProvider({ children, storage, now }: ProviderProps) {
   useEffect(() => {
     setSaveFailed(!store.save(state));
   }, [state, store]);
+
+  // Another tab (e.g. the installed app plus a browser tab) saved newer data: adopt it instead of overwriting it later.
+  useEffect(
+    () => store.subscribe?.((incoming) => dispatch({ type: 'replaceState', state: incoming, today: toDateKey(new Date()) })),
+    [store],
+  );
 
   const stats = useMemo(() => progressStats(state, today), [state.completions, state.redemptions, today]);
 
