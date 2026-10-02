@@ -14,8 +14,8 @@ export default defineConfig(({ command }) => ({
         name: 'Gamified Todo',
         short_name: 'Todo',
         description: 'Tasks, habits, streaks and rewards.',
-        theme_color: '#5b5bf0',
-        background_color: '#f6f7fb',
+        theme_color: '#1877f2',
+        background_color: '#f0f2f5',
         display: 'standalone',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
