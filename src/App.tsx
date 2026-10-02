@@ -2,11 +2,15 @@ import { useState, type ComponentType } from 'react';
 import { Banners } from './ui/Banners';
 import { Celebrations } from './ui/Celebrations';
 import { Header } from './ui/Header';
+import { Manage } from './ui/Manage';
 import { Nav, type TabId } from './ui/Nav';
+import { Rewards } from './ui/Rewards';
 import { Today } from './ui/Today';
 
 const SCREENS: Record<TabId, ComponentType> = {
   today: Today,
+  manage: Manage,
+  rewards: Rewards,
 };
 
 export default function App() {

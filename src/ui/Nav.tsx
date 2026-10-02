@@ -1,4 +1,8 @@
-export const TABS = [{ id: 'today', label: 'Today' }] as const;
+export const TABS = [
+  { id: 'today', label: 'Today' },
+  { id: 'manage', label: 'Habits & Tasks' },
+  { id: 'rewards', label: 'Rewards' },
+] as const;
 export type TabId = (typeof TABS)[number]['id'];
 
 export function Nav({ tab, onChange }: { tab: TabId; onChange: (tab: TabId) => void }) {
